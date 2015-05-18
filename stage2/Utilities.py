@@ -1,5 +1,6 @@
 import datetime
 import time
+import re
 
 def CreateLink(latitude, longitude, time):
 	weatherAPIKey = "c9e875d725582efa9fcacefd0fc186f8/"
@@ -87,6 +88,8 @@ def TimeToDate(argument, day_specifier="", day_of_week="", ):
 	
 	if (ampm == "P"):
 		pm = True
+	else:
+		pm = False
 		
 	urlhour = int(argument[0])
 		
@@ -268,9 +271,7 @@ def CorrectDate(day, daycount):
 		today = datetime.datetime.today()
 		inputadvance = datetime.timedelta(days=int(daycount))
 		date = today + delta + inputadvance
-		return date
-		
-	
+		return date	
 		
 def ConvertToDegrees(temp):
 	temp = temp - 32
@@ -287,3 +288,18 @@ def JSONExtraction(JSON, Field, Section=""):
 		data = section[Field]
 	
 	return data
+	
+def ListTrainStops():
+
+	stops = []
+	
+	with open('google_transit/stops.txt', 'r') as f:
+		for line in f:
+			words = line.split(',')
+			
+			if (words[1] != "stop_name"):
+				stop = words[1]
+				stop = stop[1:-1]
+				stops.append(stop)
+			
+	return stops

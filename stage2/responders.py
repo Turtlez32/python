@@ -1,17 +1,26 @@
 #!/usr/bin/python
 
 # this is suitable for a GET - it has no parameters
-def initialPage():
-	data = "<html><head><title>Demonstration of a webserver</title></head><body>\n"
+def initialPage(stop):	
+	
+	data = '<html><head><title>Demonstration of a webserver</title></head><body>\n'
 	data += '<form action="http://127.0.0.1:43234/" method="POST">\n'
 	data += '<label for="name">Name:</label>\n'
 	data += '<input type="text" name="name" value="" size="" /><br>\n'
-	data += '<label for="stationName">Station Name:</label>\n'
-	data += '<input type="text" name="stationName" value="" size="" /><br>\n'
 	data += '<label for="timeHours">Time Hours:</label>'
 	data += '<input type="text" name="timeHours" value="" size="" /><br>\n'
 	data += '<label for="timeMinutes">Time Minutes:</label>'
 	data += '<input type="text" name="timeMinutes" value="" size="" /><br>\n'
+	data += '<select name="stationName">'
+	
+	for s in stop:
+		data += '<option value="'
+		data += s
+		data += '">'
+		data += s
+		data += '</option>'
+		
+	data += '</select>'
 	data += '<select name="AMPMSelector">'
 	data += '<option value="AM">AM</option>'
 	data += '<option value="PM">PM</option>'

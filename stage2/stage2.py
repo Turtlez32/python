@@ -4,6 +4,11 @@ import Utilities
 def findStation(formData):
 	
 	stationTest = formData['stationName']
+	stationList = stationTest.split(" ")
+	
+	stationTest = stationList[0]
+	print stationTest
+	
 	requestHour = formData['timeHours']
 	requestMinute = formData['timeMinutes']
 	date = formData['date']
@@ -36,6 +41,15 @@ def findStation(formData):
 	temperature = currently['temperature']
 	realfeel = currently['apparentTemperature']
 	
+	try:
+		preciptype = Utilities.JSONExtraction(data, "precipType")
+		rainintensity = Utilities.JSONExtraction(data, "precipIntensity", "currently")
+		rainprobability = Utilities.JSONExtraction(data, "precipProbability", "currently")
+	except KeyError:
+		preciptype = ""
+		rainintensity = ""
+		rainprobability = ""
+	
 	temperature = int((temperature - 32) * 5.0/9.0)
 	realfeel = int((realfeel - 32) * 5.0/9.0)
 
@@ -46,22 +60,13 @@ def findStation(formData):
 	html = '<html> <head> </head> <body>'
 	html += 'Hi '
 	html += userName
-	html += '<p>You have selected the station is: '
-	html += stationTest
-	html += '<p>The Current weather summary is: '
-	html += summary
-	html += '<table><tr>'
-	html += '<td>Current Temp:</td><td>'
-	html += temperature
-	html += '</td></tr><tr>'
-	html += '<td>Apparent Temp:</td><td>'
-	html += realfeel
-	html += '</td>'
-	html += '</tr></table>'
-	html += requestHour
-	html += requestMinute
-	html += dayOfWeek
-	html += date
-	html += ampmSelector
+	html += '<p>You have selected the station is: ' + stationTest
+	html += '<p>The Current weather summary is: ' + summary
+	html += '<table>'
+	html += '<tr><td>Current Temp:</td><td>' + temperature + '</td></tr>'
+	html += '<tr><td>Apparent Temp:</td><td>' + realfeel + '</td></tr>'
+	html += '<tr><td>Rain Intensity:</td><td>' + rainintensity + '</tr><tr>'
+	html += '<td>Rain Probability:</td><td>' + rainprobability + '</td></tr>'
+	html += '</table>'
 	
 	return html

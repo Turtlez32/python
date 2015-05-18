@@ -14,7 +14,7 @@ from os import curdir, sep
 
 import sys
 import importlib
-
+import Utilities
 
 import cgi
 
@@ -70,6 +70,10 @@ class myHandler (BaseHTTPRequestHandler):
 		assetsDir = "assets"
 		asset = False
 		
+		stopList = []
+		
+		stopList = Utilities.ListTrainStops()
+		
 		try:
 			# Check the file extension required and
 			# set the right mime type
@@ -83,7 +87,12 @@ class myHandler (BaseHTTPRequestHandler):
 				mimetype = 'image/jpg'
 				sendReply = True
 				asset = True
-				
+			
+			elif self.path.endswith(".png"):
+				mimetype = 'image/png'
+				sendReply = True
+				asset = True
+			
 			elif self.path.endswith(".gif"):
 				mimetype = 'image/gif'
 				sendReply = True
@@ -103,30 +112,40 @@ class myHandler (BaseHTTPRequestHandler):
 			
 			if sendReply == True:
 			
-				
 				# should we send an asset, or should we generate a page?
 				if asset == True:
 					self.sendHeader(200, mimetype)
 					# Open the static file requested and send it
 					# assets all live in an asset directory
 					
-					f = open(curdir + sep + assetsDir + sep + self.path) 
+					assetLocation = curdir + sep + assetsDir + sep + self.path
+
+					try:
+						f = open(assetLocation, 'rb')
+					except IOError:
+						self.send_error(404,'Asset %s Not Found at : %s' % (self.path, assetLocation))
+						return
+
 					self.wfile.write(f.read())
 					f.close()
-				else:
 					
+				else:					
 					try:
 						self.sendHeader(200, mimetype)
 						method = getController('GET', self.path)
-						self.wfile.write(method())
+						self.wfile.write(method(stopList))
 					except:
-						# doesn't seem to work for some reason...???
-						self.send_error(404,'File Not Found: %s' % self.path)
+						# doesn't seem to work for some reason...
+						self.send_error(404,'Couldn\'t generate page for : %s' % self.path)
+						return
 
 			return
 
-		except IOError, ValueError:
+		except IOError:
 			self.send_error(404,'File Not Found: %s' % self.path)
+
+		except ValueError:
+			self.send_error(404,'Couldn\'t find function from Routes file for path: %s' % self.path)
 
 	#---------------------------------------------------------
 	# Handler for the POST requests
@@ -146,9 +165,9 @@ class myHandler (BaseHTTPRequestHandler):
 		# move the cgi parameters (from the form) into a dictionary
 		
 		parameters = {}
+		
 		for key in form.keys():
 			parameters[key] = form[key].value
-		
 		
 		# create a response back to the web browser that
 		# requested this page.
@@ -175,7 +194,7 @@ try:
 	# Create a web server and define the handler to manage the
 	# incoming request
 	server = HTTPServer(('', PORT_NUMBER), myHandler)
-	print 'Started httpserver on port ' , PORT_NUMBER
+	print 'Started httpserver on port ', PORT_NUMBER
 	
 	# Wait forever for incoming htto requests
 	server.serve_forever()
@@ -183,7 +202,4 @@ try:
 except KeyboardInterrupt:
 	print '^C received, shutting down the web server'
 	server.socket.close()
-
-def stationCheck():
-	print """ <html> <body> Test </body> </html> """
 	
