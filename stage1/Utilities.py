@@ -6,7 +6,7 @@ def CreateLink(latitude, longitude, time):
 	url = "https://api.forecast.io/forecast/"
 	
 	stationLink = url + weatherAPIKey + latitude + "," + longitude + "," + str(time)
-	
+
 	return stationLink
 
 def FindVariableType(var):
